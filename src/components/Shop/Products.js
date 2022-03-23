@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useHttp from "../../hooks/use-http";
 import { productsAction } from "../../store/products";
 import ProductItem from "./ProductItem";
@@ -8,7 +8,19 @@ import classes from "./Products.module.css";
 const Products = (props) => {
   const [allProductsList, setAllProductsList] = useState([]);
   const { isLoading, isError, sendRequest: retrieveProducts } = useHttp();
+  const { sendRequest: sendAddProducts } = useHttp();
+  const selectedProducts = useSelector(
+    (state) => state.products.selectedProducts
+  );
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    sendAddProducts({
+      url: "https://react-http-2083a-default-rtdb.firebaseio.com/productsSelected.json",
+      body: selectedProducts,
+      method: "PUT",
+    });
+  }, [selectedProducts, sendAddProducts]);
 
   useEffect(() => {
     retrieveProducts(
