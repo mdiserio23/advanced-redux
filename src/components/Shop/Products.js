@@ -1,17 +1,49 @@
-import ProductItem from './ProductItem';
-import classes from './Products.module.css';
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import useHttp from "../../hooks/use-http";
+import { productsAction } from "../../store/products";
+import ProductItem from "./ProductItem";
+import classes from "./Products.module.css";
 
 const Products = (props) => {
+  const [allProductsList, setAllProductsList] = useState([]);
+  const { isLoading, isError, sendRequest: retrieveProducts } = useHttp();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    retrieveProducts(
+      {
+        url: "https://react-http-2083a-default-rtdb.firebaseio.com/products.json",
+      },
+      setAllProductsList
+    );
+  }, [retrieveProducts]);
+
+  const onAddToCartHandler = (item) => {
+    dispatch(productsAction.addToCart(item));
+  };
+
+  const productItem =
+    allProductsList.length !== 0 &&
+    allProductsList.map((item) => {
+      return (
+        <ul key={item.id}>
+          <ProductItem
+            id={item.id}
+            onAddToCart={onAddToCartHandler}
+            title={item.title}
+            price={item.price}
+            description={item.description}
+          />
+        </ul>
+      );
+    });
   return (
     <section className={classes.products}>
       <h2>Buy your favorite products</h2>
-      <ul>
-        <ProductItem
-          title='Test'
-          price={6}
-          description='This is a first product - amazing!'
-        />
-      </ul>
+      {isLoading && <p>Is Loading...</p>}
+      {!isLoading && isError && <p>Something went wrong.</p>}
+      {!isLoading && !isError && productItem}
     </section>
   );
 };
