@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  allProductsList: [],
   selectedProducts: [],
 };
 
@@ -8,6 +9,9 @@ const productsSlice = createSlice({
   name: "products",
   initialState,
   reducers: {
+    setAllProductsList(state, action) {
+      state.allProductsList = [...action.payload]
+    },
     addToCart(state, action) {
       const productExistIndex = state.selectedProducts.findIndex(
         (item) => item.id === action.payload.id
@@ -35,7 +39,7 @@ const productsSlice = createSlice({
       const productExistIndex = state.selectedProducts.findIndex(
         (item) => item.id === action.payload.id
       );
-      if(state.selectedProducts[productExistIndex].quantity === 1) {
+      if (state.selectedProducts[productExistIndex].quantity === 1) {
         state.selectedProducts.splice(productExistIndex, 1);
         return;
       }

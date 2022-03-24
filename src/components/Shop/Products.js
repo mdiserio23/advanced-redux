@@ -1,23 +1,17 @@
-import { useEffect, useState } from "react";
-import { useDispatch} from "react-redux";
-import useHttp from "../../hooks/use-http";
-import { productsAction } from "../../store/products";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { productsAction } from "../../store/Products/products";
+import { retrieveProducts } from "../../store/Products/products-actions";
 import ProductItem from "./ProductItem";
 import classes from "./Products.module.css";
 
 const Products = (props) => {
-  const [allProductsList, setAllProductsList] = useState([]);
-  const { isLoading, isError, sendRequest: retrieveProducts } = useHttp();
+  const allProductsList = useSelector((state) => state.products.allProductsList);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    retrieveProducts(
-      {
-        url: "https://react-http-2083a-default-rtdb.firebaseio.com/products.json",
-      },
-      setAllProductsList
-    );
-  }, [retrieveProducts]);
+    dispatch(retrieveProducts());
+  }, [dispatch]);
 
   const onAddToCartHandler = (item) => {
     dispatch(productsAction.addToCart(item));
@@ -41,9 +35,7 @@ const Products = (props) => {
   return (
     <section className={classes.products}>
       <h2>Buy your favorite products</h2>
-      {isLoading && <p>Is Loading...</p>}
-      {!isLoading && isError && <p>Something went wrong.</p>}
-      {!isLoading && !isError && productItem}
+      {productItem}
     </section>
   );
 };
